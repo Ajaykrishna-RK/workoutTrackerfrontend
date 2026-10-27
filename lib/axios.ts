@@ -11,7 +11,7 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,7 +20,7 @@ const api = axios.create({
 // Bare client for the refresh call so it never goes through the interceptors below.
 const refreshClient = axios.create({
   baseURL,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -46,6 +46,13 @@ export interface ApiError {
 type ErrorBody = { message?: string | string[] };
 
 function toApiError(error: AxiosError<ErrorBody>): ApiError {
+  if (error.code === AxiosError.ECONNABORTED || error.code === AxiosError.ETIMEDOUT) {
+    return {
+      status: null,
+      message: "The server is taking too long to respond. Please try again.",
+    };
+  }
+
   const raw = error.response?.data?.message;
   const message = Array.isArray(raw) ? raw.join(", ") : raw;
   return {
