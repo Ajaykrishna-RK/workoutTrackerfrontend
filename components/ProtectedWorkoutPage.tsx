@@ -3,7 +3,8 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { getAccessToken } from "@/lib/auth/token-storage";
-import WorkoutTracker from "./WorkoutTracker";
+import WorkoutTracker from "./workout/components/WorkoutTracker";
+
 
 function subscribeToSession(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);

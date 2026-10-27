@@ -66,7 +66,7 @@ export default function Login() {
             className={inputClass}
             value={form.password}
             onChange={(e) => update("password", e.target.value)}
-            minLength={8}
+          
             required
           />
         </label>
