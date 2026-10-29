@@ -37,3 +37,16 @@ export interface WorkoutCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
+
+export type DateRangePreset = "7d" | "15d" | "30d" | "3m" | "6m" | "1y" | "custom";
+
+export interface DateFilterValue {
+  preset: DateRangePreset;
+  from: string;
+  to: string;
+}
+
+export interface DateFilterProps {
+  value: DateFilterValue;
+  onChange: (value: DateFilterValue) => void;
+}
