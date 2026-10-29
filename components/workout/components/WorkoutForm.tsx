@@ -1,10 +1,11 @@
 "use client";
 
 import FormMessage from "@/components/common/FormMessage";
-import { useWorkoutForm } from "../hooks/useWorkout";
+
 import type { WorkoutFormProps } from "../types/workoutTypes";
 import { inputClass } from "../utils/styles";
 import ExerciseFields from "./ExerciseFields";
+import { useWorkoutForm } from "../hooks/useWorkoutForm";
 
 export default function WorkoutForm({ initial, onSubmit, onCancel }: WorkoutFormProps) {
   const {

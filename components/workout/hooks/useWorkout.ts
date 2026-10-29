@@ -12,8 +12,6 @@ import {
   updateWorkout,
 } from "../api/workouts";
 import { errorMessage, isNotFound, isUnauthorized } from "../utils/apiErrors";
-import type { ExerciseDraft, ExerciseDraftField } from "../types/workoutTypes";
-import { emptyExercise, toDraft, validateWorkout } from "../utils/workoutForm";
 
 const GONE_MESSAGE = "That workout no longer exists.";
 
@@ -23,7 +21,6 @@ export function useWorkouts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Workout | null>(null);
-  // The workout whose edit/delete request is in flight.
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const endSession = useCallback(() => {
@@ -58,7 +55,6 @@ export function useWorkouts() {
     };
   }, [handleError]);
 
-  // Form errors (validation, 400s) are shown inside the form, so only auth failures are handled here.
   function rethrowUnlessUnauthorized(err: unknown): never {
     if (isUnauthorized(err)) endSession();
     throw err;
@@ -91,7 +87,6 @@ export function useWorkouts() {
     setError(null);
     setBusyId(id);
     try {
-      // Fetch the latest copy so edits start from the server's version.
       setEditing(await getWorkout(id));
     } catch (err) {
       if (isNotFound(err)) {
@@ -117,7 +112,6 @@ export function useWorkouts() {
       removeLocal(id);
       if (editing?.id === id) setEditing(null);
     } catch (err) {
-      // Already gone on the server, so the end state is the same.
       if (isNotFound(err)) removeLocal(id);
       else handleError(err, "Could not delete workout.");
     } finally {
@@ -139,65 +133,4 @@ export function useWorkouts() {
   };
 }
 
-export function useWorkoutForm(
-  initial: Workout | undefined,
-  onSubmit: (input: WorkoutInput) => Promise<void>
-) {
-  const isEdit = Boolean(initial);
-  const [name, setName] = useState(initial?.name ?? "");
-  const [drafts, setDrafts] = useState<ExerciseDraft[]>(() =>
-    initial ? initial.exercises.map(toDraft) : [emptyExercise()]
-  );
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  function updateExercise(key: string, field: ExerciseDraftField, value: string) {
-    setDrafts((prev) => prev.map((d) => (d.key === key ? { ...d, [field]: value } : d)));
-  }
-
-  function addExercise() {
-    setDrafts((prev) => [...prev, emptyExercise()]);
-  }
-
-  function removeExercise(key: string) {
-    setDrafts((prev) => prev.filter((d) => d.key !== key));
-  }
-
-  function reset() {
-    setName("");
-    setDrafts([emptyExercise()]);
-  }
-
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const result = validateWorkout(name, drafts);
-    if (typeof result === "string") {
-      setError(result);
-      return;
-    }
-
-    setError(null);
-    setLoading(true);
-    try {
-      await onSubmit(result);
-      if (!isEdit) reset();
-    } catch (err) {
-      setError(errorMessage(err, "Could not save workout. Please try again."));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return {
-    isEdit,
-    name,
-    setName,
-    drafts,
-    updateExercise,
-    addExercise,
-    removeExercise,
-    error,
-    loading,
-    handleSubmit,
-  };
-}

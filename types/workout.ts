@@ -18,7 +18,6 @@ export interface WorkoutInput {
   exercises: Exercise[];
 }
 
-// PATCH accepts either field; a supplied `exercises` replaces the whole array.
 export type WorkoutUpdateInput = Partial<WorkoutInput>;
 
 export interface WorkoutMutationResponse {

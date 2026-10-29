@@ -1,6 +1,5 @@
 import type { Workout, WorkoutInput } from "@/types/workout";
 
-// Numeric fields are kept as strings while editing so inputs can be cleared.
 export interface ExerciseDraft {
   key: string;
   name: string;

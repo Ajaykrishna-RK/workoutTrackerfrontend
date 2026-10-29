@@ -8,7 +8,6 @@ import { getProfile, logout } from "./login/api/auth";
 
 export default function SessionHeader() {
   const router = useRouter();
-  // Only rendered after the client-side session check, so localStorage is safe to read here.
   const [email, setEmail] = useState(() => getStoredUser()?.email ?? null);
 
   useEffect(() => {

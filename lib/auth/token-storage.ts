@@ -4,7 +4,6 @@ const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 const USER_KEY = "auth_user";
 
-// localStorage only exists in the browser; on the server every getter returns null.
 const isBrowser = () => typeof window !== "undefined";
 
 export function getAccessToken(): string | null {

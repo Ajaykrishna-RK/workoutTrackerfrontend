@@ -19,8 +19,6 @@ export const toDraft = (exercise: Exercise): ExerciseDraft => ({
 
 const isPositiveInt = (n: number) => Number.isInteger(n) && n > 0;
 
-// Mirrors the backend rules so most mistakes are caught before a round trip.
-// Returns the request body on success, or an error message.
 export function validateWorkout(name: string, drafts: ExerciseDraft[]): WorkoutInput | string {
   if (!name.trim()) return "Workout name is required.";
   if (drafts.length === 0) return "Add at least one exercise.";

@@ -10,7 +10,6 @@ import type { LoginMode } from "./types/loginTypes";
 export default function Login() {
   const router = useRouter();
   const [mode, setMode] = useState<LoginMode>("login");
-  // Carries the typed email across when switching between the two forms.
   const [email, setEmail] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 

@@ -7,7 +7,6 @@ import type {
   WorkoutUpdateInput,
 } from "@/types/workout";
 
-// Newest first, scoped to the signed-in user.
 export async function listWorkouts(): Promise<Workout[]> {
   const { data } = await api.get<Workout[]>("/workouts");
   return data;

@@ -17,7 +17,6 @@ const api = axios.create({
   },
 });
 
-// Bare client for the refresh call so it never goes through the interceptors below.
 const refreshClient = axios.create({
   baseURL,
   timeout: 60000,
@@ -26,7 +25,6 @@ const refreshClient = axios.create({
   },
 });
 
-// Auth endpoints return 401 for bad credentials/tokens; never try to refresh on those.
 const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh"];
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -62,7 +60,6 @@ function toApiError(error: AxiosError<ErrorBody>): ApiError {
   };
 }
 
-// Shared so concurrent 401s trigger a single refresh request.
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
