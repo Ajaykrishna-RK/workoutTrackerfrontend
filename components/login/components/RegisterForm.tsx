@@ -4,17 +4,12 @@ import { useState } from "react";
 import type { ApiError } from "@/lib/axios";
 import type { RegisterInput } from "@/types/auth";
 import { register } from "../api/auth";
-import FormField from "./FormField";
-import FormMessage from "./FormMessage";
+import type { RegisterFormProps } from "../types/loginTypes";
+import FormField from "@/components/common/FormField";
+import FormMessage from "@/components/common/FormMessage";
 import SubmitButton from "./SubmitButton";
 
-interface Props {
-  initialEmail: string;
-  notice?: string | null;
-  onSuccess: () => void;
-}
-
-export default function RegisterForm({ initialEmail, notice = null, onSuccess }: Props) {
+export default function RegisterForm({ initialEmail, notice = null, onSuccess }: RegisterFormProps) {
   const [form, setForm] = useState<RegisterInput>({ name: "", email: initialEmail, password: "" });
   const [error, setError] = useState<string | null>(notice);
   const [loading, setLoading] = useState(false);
@@ -70,7 +65,7 @@ export default function RegisterForm({ initialEmail, notice = null, onSuccess }:
           autoComplete="new-password"
           value={form.password}
           onChange={(v) => update("password", v)}
-          minLength={6}
+        
           required
         />
       </div>

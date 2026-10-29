@@ -3,8 +3,8 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { getAccessToken } from "@/lib/auth/token-storage";
-import WorkoutTracker from "./workout/components/WorkoutTracker";
-
+import WorkoutTracker from "./workout/WorkoutTracker";
+import SessionHeader from "./SessionHeader";
 
 function subscribeToSession(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
@@ -45,7 +45,7 @@ export default function ProtectedWorkoutPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
-      <h1 className="mb-6 text-3xl font-bold">Workout Tracker</h1>
+      <SessionHeader />
       <WorkoutTracker />
     </main>
   );

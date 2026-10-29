@@ -1,12 +1,7 @@
-import type { Workout } from "@/types/workout";
+import type { WorkoutListProps } from "../types/workoutTypes";
 import WorkoutCard from "./WorkoutCard";
 
-interface Props {
-  workouts: Workout[];
-  onDelete: (id: string) => void;
-}
-
-export default function WorkoutList({ workouts, onDelete }: Props) {
+export default function WorkoutList({ workouts, busyId, onEdit, onDelete }: WorkoutListProps) {
   if (workouts.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
@@ -18,7 +13,13 @@ export default function WorkoutList({ workouts, onDelete }: Props) {
   return (
     <ul className="space-y-3">
       {workouts.map((workout) => (
-        <WorkoutCard key={workout.id} workout={workout} onDelete={onDelete} />
+        <WorkoutCard
+          key={workout.id}
+          workout={workout}
+          busy={busyId === workout.id}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </ul>
   );

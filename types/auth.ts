@@ -13,6 +13,11 @@ export interface RegisterInput extends LoginInput {
   name?: string;
 }
 
+export interface Profile {
+  userId: string;
+  email: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

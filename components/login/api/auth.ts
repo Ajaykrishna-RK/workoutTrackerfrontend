@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { clearSession, saveSession } from "@/lib/auth/token-storage";
-import type { AuthResponse, LoginInput, RegisterInput } from "@/types/auth";
+import type { AuthResponse, LoginInput, Profile, RegisterInput } from "@/types/auth";
 
 export async function login(input: LoginInput): Promise<AuthResponse> {
   const { data } = await api.post<AuthResponse>("/auth/login", {
@@ -17,6 +17,11 @@ export async function register(input: RegisterInput): Promise<AuthResponse> {
     email: input.email.trim().toLowerCase(),
   });
   saveSession(data);
+  return data;
+}
+
+export async function getProfile(): Promise<Profile> {
+  const { data } = await api.get<Profile>("/auth/profile");
   return data;
 }
 

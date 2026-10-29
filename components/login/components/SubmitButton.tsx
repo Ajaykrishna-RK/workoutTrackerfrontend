@@ -1,10 +1,6 @@
-interface Props {
-  loading: boolean;
-  label: string;
-  loadingLabel: string;
-}
+import type { SubmitButtonProps } from "../types/loginTypes";
 
-export default function SubmitButton({ loading, label, loadingLabel }: Props) {
+export default function SubmitButton({ loading, label, loadingLabel }: SubmitButtonProps) {
   return (
     <button
       type="submit"

@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 import AuthSwitch from "./components/AuthSwitch";
-
-type Mode = "login" | "register";
+import type { LoginMode } from "./types/loginTypes";
 
 export default function Login() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<LoginMode>("login");
   // Carries the typed email across when switching between the two forms.
   const [email, setEmail] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
@@ -21,7 +20,7 @@ export default function Login() {
     router.replace("/");
   }
 
-  function switchMode(next: Mode) {
+  function switchMode(next: LoginMode) {
     setMode(next);
     setNotice(null);
   }

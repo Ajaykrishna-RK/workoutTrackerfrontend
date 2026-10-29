@@ -4,18 +4,12 @@ import { useState } from "react";
 import type { ApiError } from "@/lib/axios";
 import type { LoginInput } from "@/types/auth";
 import { login } from "../api/auth";
-import FormField from "./FormField";
-import FormMessage from "./FormMessage";
+import type { LoginFormProps } from "../types/loginTypes";
+import FormField from "@/components/common/FormField";
+import FormMessage from "@/components/common/FormMessage";
 import SubmitButton from "./SubmitButton";
 
-interface Props {
-  initialEmail: string;
-  onSuccess: () => void;
-  // Called when the backend says no account exists for this email.
-  onUserNotFound: (email: string) => void;
-}
-
-export default function LoginForm({ initialEmail, onSuccess, onUserNotFound }: Props) {
+export default function LoginForm({ initialEmail, onSuccess, onUserNotFound }: LoginFormProps) {
   const [form, setForm] = useState<LoginInput>({ email: initialEmail, password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
