@@ -1,11 +1,17 @@
 import type { WorkoutListProps } from "../types/workoutTypes";
 import WorkoutCard from "./WorkoutCard";
 
-export default function WorkoutList({ workouts, busyId, onEdit, onDelete }: WorkoutListProps) {
+export default function WorkoutList({
+  workouts,
+  emptyMessage,
+  busyId,
+  onEdit,
+  onDelete,
+}: WorkoutListProps) {
   if (workouts.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
-        No workouts yet. Add your first one above.
+        {emptyMessage}
       </p>
     );
   }

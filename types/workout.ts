@@ -28,3 +28,26 @@ export interface WorkoutMutationResponse {
 export interface MessageResponse {
   message: string;
 }
+
+export type WorkoutRange = "7d" | "15d" | "30d" | "3m" | "6m" | "1y" | "custom";
+
+// Omit `range` for all workouts. `from`/`to` (YYYY-MM-DD) are only valid with range "custom".
+export interface WorkoutListQuery {
+  range?: WorkoutRange;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedWorkouts {
+  data: Workout[];
+  meta: PaginationMeta;
+}

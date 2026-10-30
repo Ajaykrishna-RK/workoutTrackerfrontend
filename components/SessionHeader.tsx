@@ -18,7 +18,7 @@ export default function SessionHeader() {
       })
       .catch((err: ApiError) => {
         if (!cancelled && err.status === 401) {
-          logout();
+          void logout();
           router.replace("/login");
         }
       });
@@ -27,8 +27,8 @@ export default function SessionHeader() {
     };
   }, [router]);
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     router.replace("/login");
   }
 

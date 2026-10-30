@@ -1,17 +1,14 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import type { AuthResponse } from "@/types/auth";
-import {
-  clearSession,
-  getAccessToken,
-  getRefreshToken,
-  saveSession,
-} from "@/lib/auth/token-storage";
+import { clearSession, getAccessToken, saveSession } from "@/lib/auth/token-storage";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api";
 
+// withCredentials lets the browser store and send the httpOnly refresh token cookie (path /auth).
 const api = axios.create({
   baseURL,
   timeout: 60000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,12 +17,13 @@ const api = axios.create({
 const refreshClient = axios.create({
   baseURL,
   timeout: 60000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh"];
+const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"];
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getAccessToken();
@@ -63,12 +61,8 @@ function toApiError(error: AxiosError<ErrorBody>): ApiError {
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) throw new Error("No refresh token");
-
-  const { data } = await refreshClient.post<AuthResponse>("/auth/refresh", {
-    refreshToken,
-  });
+  // No body: the browser sends the refreshToken cookie and the server rotates it.
+  const { data } = await refreshClient.post<AuthResponse>("/auth/refresh");
   saveSession(data);
   return data.accessToken;
 }

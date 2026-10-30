@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Workout, WorkoutInput } from "@/types/workout";
+import type { PaginationMeta, Workout, WorkoutInput } from "@/types/workout";
 import { logout } from "@/components/login/api/auth";
 import {
   createWorkout,
@@ -11,20 +11,36 @@ import {
   listWorkouts,
   updateWorkout,
 } from "../api/workouts";
+import type { DateFilterValue } from "../types/workoutTypes";
 import { errorMessage, isNotFound, isUnauthorized } from "../utils/apiErrors";
+import { defaultDateFilter, toWorkoutQuery } from "../utils/dateFilters";
 
 const GONE_MESSAGE = "That workout no longer exists.";
+const PAGE_SIZE = 10;
+
+interface ListState {
+  key: string | null;
+  workouts: Workout[];
+  meta: PaginationMeta | null;
+}
 
 export function useWorkouts() {
   const router = useRouter();
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [filter, setFilterState] = useState<DateFilterValue>(defaultDateFilter);
+  const [page, setPage] = useState(1);
+  const [version, setVersion] = useState(0);
+  const [list, setList] = useState<ListState>({ key: null, workouts: [], meta: null });
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Workout | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
+  const query = useMemo(() => toWorkoutQuery(filter), [filter]);
+  // Identifies the request the current filter, page and reload count call for.
+  const requestKey = query ? JSON.stringify({ ...query, page, version }) : null;
+  const loading = requestKey !== null && list.key !== requestKey;
+
   const endSession = useCallback(() => {
-    logout();
+    void logout();
     router.replace("/login");
   }, [router]);
 
@@ -36,24 +52,38 @@ export function useWorkouts() {
     [endSession]
   );
 
-  const removeLocal = (id: string) => setWorkouts((prev) => prev.filter((w) => w.id !== id));
+  const reload = () => setVersion((v) => v + 1);
+
+  const removeLocal = (id: string) =>
+    setList((prev) => ({ ...prev, workouts: prev.workouts.filter((w) => w.id !== id) }));
 
   useEffect(() => {
+    if (!query || !requestKey) return;
     let cancelled = false;
-    listWorkouts()
-      .then((data) => {
-        if (!cancelled) setWorkouts(data);
+    listWorkouts({ ...query, page, limit: PAGE_SIZE })
+      .then(({ data, meta }) => {
+        if (!cancelled) setList({ key: requestKey, workouts: data, meta });
       })
       .catch((err) => {
-        if (!cancelled) handleError(err, "Could not load workouts.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+        setList((prev) => ({ ...prev, key: requestKey }));
+        handleError(err, "Could not load workouts.");
       });
     return () => {
       cancelled = true;
     };
-  }, [handleError]);
+  }, [query, page, requestKey, handleError]);
+
+  function setFilter(next: DateFilterValue) {
+    setFilterState(next);
+    setPage(1);
+    setError(null);
+  }
+
+  function goToPage(next: number) {
+    setError(null);
+    setPage(next);
+  }
 
   function rethrowUnlessUnauthorized(err: unknown): never {
     if (isUnauthorized(err)) endSession();
@@ -62,8 +92,10 @@ export function useWorkouts() {
 
   async function create(input: WorkoutInput) {
     try {
-      const workout = await createWorkout(input);
-      setWorkouts((prev) => [workout, ...prev]);
+      await createWorkout(input);
+      // The new workout is the newest, so it lands on page 1 when it matches the filter.
+      setPage(1);
+      reload();
     } catch (err) {
       rethrowUnlessUnauthorized(err);
     }
@@ -73,7 +105,10 @@ export function useWorkouts() {
     if (!editing) return;
     try {
       const updated = await updateWorkout(editing.id, input);
-      setWorkouts((prev) => prev.map((w) => (w.id === updated.id ? updated : w)));
+      setList((prev) => ({
+        ...prev,
+        workouts: prev.workouts.map((w) => (w.id === updated.id ? updated : w)),
+      }));
       setEditing(null);
     } catch (err) {
       if (!isNotFound(err)) rethrowUnlessUnauthorized(err);
@@ -109,8 +144,10 @@ export function useWorkouts() {
     setBusyId(id);
     try {
       await deleteWorkout(id);
-      removeLocal(id);
       if (editing?.id === id) setEditing(null);
+      // Refetch so the page refills and totals stay right; step back if the page is now empty.
+      if (list.workouts.length === 1 && page > 1) setPage(page - 1);
+      else reload();
     } catch (err) {
       if (isNotFound(err)) removeLocal(id);
       else handleError(err, "Could not delete workout.");
@@ -120,11 +157,17 @@ export function useWorkouts() {
   }
 
   return {
-    workouts,
+    workouts: list.workouts,
+    meta: list.meta,
+    filter,
+    awaitingDates: query === null,
+    hasLoaded: list.key !== null,
     loading,
     error,
     editing,
     busyId,
+    setFilter,
+    goToPage,
     create,
     update,
     startEdit,
@@ -132,5 +175,3 @@ export function useWorkouts() {
     remove,
   };
 }
-
-

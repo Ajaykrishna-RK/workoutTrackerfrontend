@@ -1,4 +1,4 @@
-import type { Workout, WorkoutInput } from "@/types/workout";
+import type { PaginationMeta, Workout, WorkoutInput, WorkoutRange } from "@/types/workout";
 
 export interface ExerciseDraft {
   key: string;
@@ -26,6 +26,7 @@ export interface ExerciseFieldsProps {
 
 export interface WorkoutListProps {
   workouts: Workout[];
+  emptyMessage: string;
   busyId: string | null;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
@@ -38,7 +39,7 @@ export interface WorkoutCardProps {
   onDelete: (id: string) => void;
 }
 
-export type DateRangePreset = "7d" | "15d" | "30d" | "3m" | "6m" | "1y" | "custom";
+export type DateRangePreset = WorkoutRange | "all";
 
 export interface DateFilterValue {
   preset: DateRangePreset;
@@ -49,4 +50,10 @@ export interface DateFilterValue {
 export interface DateFilterProps {
   value: DateFilterValue;
   onChange: (value: DateFilterValue) => void;
+}
+
+export interface PaginationProps {
+  meta: PaginationMeta;
+  disabled: boolean;
+  onPageChange: (page: number) => void;
 }

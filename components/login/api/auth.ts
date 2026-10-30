@@ -25,6 +25,12 @@ export async function getProfile(): Promise<Profile> {
   return data;
 }
 
-export function logout(): void {
+// Clears the local session immediately, then asks the server to clear the refresh cookie.
+export async function logout(): Promise<void> {
   clearSession();
+  try {
+    await api.post("/auth/logout");
+  } catch {
+    // Nothing to recover: the user is signed out locally either way.
+  }
 }

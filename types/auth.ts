@@ -18,11 +18,10 @@ export interface Profile {
   email: string;
 }
 
+// The refresh token is not in the body; the backend sets it as an httpOnly cookie.
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
   tokenType: "Bearer";
   expiresIn: string;
-  refreshExpiresIn: string;
   user: User;
 }

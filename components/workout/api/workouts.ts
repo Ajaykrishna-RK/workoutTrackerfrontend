@@ -1,14 +1,16 @@
 import api from "@/lib/axios";
 import type {
   MessageResponse,
+  PaginatedWorkouts,
   Workout,
   WorkoutInput,
+  WorkoutListQuery,
   WorkoutMutationResponse,
   WorkoutUpdateInput,
 } from "@/types/workout";
 
-export async function listWorkouts(): Promise<Workout[]> {
-  const { data } = await api.get<Workout[]>("/workouts");
+export async function listWorkouts(query: WorkoutListQuery = {}): Promise<PaginatedWorkouts> {
+  const { data } = await api.get<PaginatedWorkouts>("/workouts", { params: query });
   return data;
 }
 
